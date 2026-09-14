@@ -24,28 +24,41 @@ const postArticle = async (req, res, next) => {
 
     } 
     catch (error) {
-        console.log(error);
+        res.status(500).json({ error: error });
         next(error);
     }
 }
 
 const getAllArticles = async (req, res, next) => {
+    
+    const { limit = 10, page = 1, search } = req.query;
+    const skip = (page - 1 ) * limit;
+
+    let query = {}
+    if (search) {
+        query = {
+            $or: [
+                { title: {$regex: search, $options: 'i'} },
+                { content: {$regex: search, $options: 'i'} }
+            ]
+        }
+    }
+
     try {
-        const {limit = 10, page = 1 } = req.query;
-        const skip = (page - 1 ) * limit;
+        const articles = await ArticleModel.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+        const totalArticles = await ArticleModel.countDocuments(query)
 
-        const articles = await ArticleModel.find({})
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
-        return res.status(200).json({
-            message: "All Articles fetched successfully",
-            data: articles
-        })
-
+        res.status(200).json({
+            articles,
+            totalArticles: Math.ceil(totalArticles / limit),
+            currentPage: parseInt(page)
+            })
     } 
     catch (error) {
-        console.log(error);
+        res.status(500).json({ error: error });
         next(error);
     }
 }
@@ -97,7 +110,7 @@ const updateArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        console.log(error);
+        res.status(500).json({ error: error });;
         next(error);
     }
 }
@@ -115,15 +128,18 @@ const deleteArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        console.log(error);
+        res.status(500).json({ error: error });;
         next(error);
     }
 }
+
+
+
 
 module.exports = {
     postArticle,
     getAllArticles,
     getArticleById,
     updateArticleById,
-    deleteArticleById
+    deleteArticleById,
 }
