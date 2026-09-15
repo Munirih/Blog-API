@@ -5,9 +5,10 @@ const UserModel = require('../models/user.model')
 
 
 const registerUser = async (req, res, next) => {
+    
     const registerSchema = Joi.object({
         name: Joi.string().min(2).required(),
-        email: Joi.string().email().required().unique(),
+        email: Joi.string().email().required(),
         password: Joi.string().required()
     });
     const {error} = registerSchema.validate(req.body)
@@ -44,8 +45,7 @@ const registerUser = async (req, res, next) => {
 
 const loginUser = async (req, res, next) => {
     const loginSchema = Joi.object({
-        name: Joi.string().min(2).required(),
-        email: Joi.string().email().required().unique(),
+        email: Joi.string().email().required(),
         password: Joi.string().required()
     });
     const {error} = loginSchema.validate(req.body)
@@ -66,8 +66,16 @@ const loginUser = async (req, res, next) => {
             { userId: user._id, name: user.name },
             process.env.JWT_SECRET,
             { expiresIn: '7d'}
+        
         );
-        return res.status(200).json({ message: "Logged in!", user, token });
+
+        const responseUser = {
+            _id: user._id,
+            email: user.email,
+            name: user.name
+        }
+
+        return res.status(200).json({ message: "Logged in!", user: responseUser, token });
     }
     catch (error) {
         console.log(error)
