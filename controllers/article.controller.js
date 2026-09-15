@@ -5,7 +5,6 @@ const postArticle = async (req, res, next) => {
     const articleSchema = Joi.object({
         title: Joi.string().min(5).required(),
         content: Joi.string().min(10).required(),
-        author: Joi.string().default("Anonymous"),
     });
 
     const { error, value } = articleSchema.validate(req.body);
@@ -15,7 +14,11 @@ const postArticle = async (req, res, next) => {
 
     try {
         const { title, content, author } = value;
-        const newArticle = new ArticleModel({ title, content, author });
+        const newArticle = new ArticleModel({ 
+            title: req.body.title,
+            content: req.body.content, 
+            author: req.user._id});
+
         await newArticle.save();
         res.status(201).json({
             message: "New Article Created!",
@@ -45,7 +48,7 @@ const getAllArticles = async (req, res, next) => {
     }
 
     try {
-        const articles = await ArticleModel.find(query)
+        const articles = await ArticleModel.find(query).populate("author _id name email ")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit));

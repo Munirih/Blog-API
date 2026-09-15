@@ -15,6 +15,7 @@ const registerUser = async (req, res, next) => {
     if (error) {
         return res.status(400).json({ message: error.details[0].message })
     }
+
     try {
         const { name, email, password } = req.body
 
@@ -52,21 +53,22 @@ const loginUser = async (req, res, next) => {
     if (error) {
         return res.status(400).json({ message: error.details[0].message })
     }
+
     try {
         const { email, password } = req.body
         const user = await UserModel.findOne({ email: email})
         if (!user) {
             return res.status(404).json({ message: "User does not exist!"})
         }
+
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch) throw new Error('Invalid credentials')
-        
+        console.log("JWT secret loaded during login:", !!process.env.JWT_SECRET);
         
         const token = jwt.sign(
             { userId: user._id, name: user.name },
             process.env.JWT_SECRET,
             { expiresIn: '7d'}
-        
         );
 
         const responseUser = {
