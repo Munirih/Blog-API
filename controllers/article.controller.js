@@ -134,8 +134,6 @@ const deleteArticleById = async (req, res, next) => {
 }
 
 
-
-
 module.exports = {
     postArticle,
     getAllArticles,
