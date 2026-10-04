@@ -113,7 +113,7 @@ const updateArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        res.status(500).json({ error: error });;
+        res.status(500).json({ error: error });
         next(error);
     }
 }
