@@ -5,7 +5,9 @@ const RequestLogger = require("./middlewares/logger")
 const errorHandler = require("./middlewares/errorHandler")
 const ArticleRoutes = require("./routes/article.route")
 const UserRoutes = require("./routes/user.route")
+const validateEnv = require("./config/validateEnv")
 
+validateEnv();
 
 const app = express();
 
@@ -15,10 +17,8 @@ app.use(cors('*'));
 
 app.use(RequestLogger);
 
-
+app.use('/api/users', UserRoutes);
 app.use('/api', ArticleRoutes);
-app.use('/api/users/', UserRoutes);
-
 
 
 app.get("/", (req, res) => {

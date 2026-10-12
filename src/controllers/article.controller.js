@@ -1,17 +1,9 @@
 const Joi = require('joi');
 const ArticleModel = require('../models/article.model');
 
+
 const postArticle = async (req, res, next) => {
-    const articleSchema = Joi.object({
-        title: Joi.string().min(5).required(),
-        content: Joi.string().min(10).required(),
-    });
-
-    const { error, value } = articleSchema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
-
+    
     try {
         const { title, content, author } = value;
         const newArticle = new ArticleModel({ 
@@ -48,7 +40,7 @@ const getAllArticles = async (req, res, next) => {
     }
 
     try {
-        const articles = await ArticleModel.find(query).populate("author _id name email ")
+        const articles = await ArticleModel.find(query).populate("author", "name email ")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(parseInt(limit));
@@ -86,13 +78,7 @@ const getArticleById = async (req, res, next) => {
 }
 
 const updateArticleById = async (req, res, next) => {
-        const articleSchema = Joi.object({
-        title: Joi.string().min(5).optional(),
-        content: Joi.string().min(10).optional(),
-        author: Joi.string().optional(),
-    });
-
-    const { error, value } = articleSchema.validate(req.body);
+        const { error, value } = updateValidationSchema.validate(req.body);
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }

@@ -1,4 +1,3 @@
-const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 const UserModel = require('../models/user.model')
@@ -6,17 +5,6 @@ const { hashPassword } = require('../utils/bcrypt')
 
 
 const registerUser = async (req, res, next) => {
-    
-    const registerSchema = Joi.object({
-        name: Joi.string().min(2).required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
-    });
-    const {error} = registerSchema.validate(req.body)
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message })
-    }
-
     try {
         const { name, email, password } = req.body
 
@@ -44,15 +32,6 @@ const registerUser = async (req, res, next) => {
 
 
 const loginUser = async (req, res, next) => {
-    const loginSchema = Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
-    });
-    const {error} = loginSchema.validate(req.body)
-    if (error) {
-        return res.status(400).json({ message: error.details[0].message })
-    }
-
     try {
         const { email, password } = req.body
         const user = await UserModel.findOne({ email: email})
