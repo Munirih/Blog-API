@@ -9,10 +9,14 @@ const registerUser = async (req, res, next) => {
         const { name, email, password } = req.body
 
         const existingUser = await UserModel.findOne({ email: email })
+
         if (existingUser) {
-            return res.status(400).json({ message: "User already exist!"})
+            return res.status(400).json({ 
+                message: "User already exist!"
+            })
         }
-        await hashPassword(password)
+        const hashed = await hashPassword(password)
+
         const user = new UserModel({
         name: name,
         email: email,
@@ -20,7 +24,8 @@ const registerUser = async (req, res, next) => {
     })
 
         await user.save()
-        return res.status(200).json({
+
+        return res.status(201).json({
             message: "User successfully registered!"
         })
     }

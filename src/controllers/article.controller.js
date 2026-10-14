@@ -5,7 +5,7 @@ const ArticleModel = require('../models/article.model');
 const postArticle = async (req, res, next) => {
     
     try {
-        const { title, content, author } = value;
+        const { title, content } = req.body;
         const newArticle = new ArticleModel({ 
             title: req.body.title,
             content: req.body.content, 
@@ -19,8 +19,7 @@ const postArticle = async (req, res, next) => {
 
     } 
     catch (error) {
-        res.status(500).json({ error: error });
-        next(error);
+        return next(error);
     }
 }
 
@@ -53,8 +52,7 @@ const getAllArticles = async (req, res, next) => {
             })
     } 
     catch (error) {
-        res.status(500).json({ error: error });
-        next(error);
+        return next(error);
     }
 }
 
@@ -72,16 +70,11 @@ const getArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        console.log(error);
-        next(error);
+        return next(error);
     }
 }
 
 const updateArticleById = async (req, res, next) => {
-        const { error, value } = updateValidationSchema.validate(req.body);
-    if (error) {
-        return res.status(400).json({ error: error.details[0].message });
-    }
     try {
         const updatedArticle = await ArticleModel.findByIdAndUpdate(
             req.params.id, 
@@ -99,8 +92,7 @@ const updateArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        res.status(500).json({ error: error });
-        next(error);
+        return next(error);
     }
 }
 
@@ -117,8 +109,7 @@ const deleteArticleById = async (req, res, next) => {
         })
     } 
     catch (error) {
-        res.status(500).json({ error: error });;
-        next(error);
+        return next(error);
     }
 }
 
